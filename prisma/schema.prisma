@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "sqlite"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOWN_DATABASE_URL")
+}
+
+model Url {
+  id         String      @id @default(uuid())
+  href       String
+  hash       String      @unique
+  createdAt  DateTime    @default(now()) @map(name: "created_at")
+  updatedAt  DateTime    @updatedAt @map(name: "updated_at")
+  statistics Statistic[]
+
+  @@index([hash])
+  @@map(name: "shortened_urls")
+}
+
+model Statistic {
+  id        String   @id @default(uuid())
+  urlId     String   @map(name: "url_id")
+  url       Url      @relation(fields: [urlId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userAgent String   @map(name: "user_agent")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+}
