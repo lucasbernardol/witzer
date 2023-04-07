@@ -1,12 +1,8 @@
 import { createServer } from 'node:http';
-import { reply } from './utils/reply.util';
+import type { Server as HTTPServer } from 'node:http';
 
-createServer(async (request, response) => {
-  return response
-    .writeHead(200, {
-      'Content-type': 'application/json',
-    })
-    .end(JSON.stringify(reply()));
-})
-  .listen(3333)
-  .on('listening', () => console.log('\nOK'));
+import { app } from './app';
+
+const Server: HTTPServer = createServer(app);
+
+Server.listen(process.env.PORT || 3333, () => console.log('\nOK'));
