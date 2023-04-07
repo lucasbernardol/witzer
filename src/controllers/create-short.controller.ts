@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { CreateShortService } from '../services/create-short.service';
 
-export class CreateURLController {
+export class CreateShortController {
   public constructor(
     private readonly services: CreateShortService = new CreateShortService()
   ) {}

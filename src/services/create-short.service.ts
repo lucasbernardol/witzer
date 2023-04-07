@@ -1,5 +1,5 @@
 // prettier-ignore
-import type { PrismaRepository, Url } from '../repositories/interfaces/PrismaRepository';
+import type { IPrismaUrlRepository, Url } from '../repositories/interfaces/IPrismaUrlRepository';
 import { PrismaUrlRepository } from '../repositories/prisma-url.repository';
 import { nanoid } from '../utils/nanoid.util';
 
@@ -9,7 +9,7 @@ export interface CreateShortServices {
 
 export class CreateShortService implements CreateShortServices {
   public constructor(
-    private readonly repository: PrismaRepository = new PrismaUrlRepository()
+    private readonly repository: IPrismaUrlRepository = new PrismaUrlRepository()
   ) {}
 
   async execute({ href }: Pick<Url, 'href'>): Promise<Url> {

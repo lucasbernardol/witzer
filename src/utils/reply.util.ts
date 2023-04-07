@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+
+// @ts-ignore
 import pkg from '../../package.json';
 
 assert.ok(pkg?.version);
