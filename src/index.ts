@@ -1,3 +1,5 @@
+import 'dotenv/config'; // Path: <rootDir>/.env
+
 import { createServer } from 'node:http';
 import type { Server as HTTPServer } from 'node:http';
 
