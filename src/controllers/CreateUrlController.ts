@@ -1,29 +1,22 @@
 import type { Request, Response, NextFunction } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
-import { prismaClient } from '../prisma';
-import { nanoid } from '../utils/nanoid.util';
+import { CreateShortService } from '../services/create-short.service';
 
-class CreateURLController {
-  public constructor() {}
+export class CreateURLController {
+  public constructor(
+    private readonly services: CreateShortService = new CreateShortService()
+  ) {}
 
-  async handle(request: Request, response: Response, next: NextFunction) {
+  handle = async (request: Request, response: Response, next: NextFunction) => {
     try {
       const { href } = request.body as { href: string };
 
-      const hash = await nanoid();
+      const short = await this.services.execute({ href });
 
-      const shortened = await prismaClient.url.create({
-        data: {
-          href,
-          hash,
-        },
-      });
-
-      return response.json(shortened);
+      return response.status(StatusCodes.CREATED).json(short);
     } catch (error: any) {
       return next(error);
     }
-  }
+  };
 }
-
-export { CreateURLController };

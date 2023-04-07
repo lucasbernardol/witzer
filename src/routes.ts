@@ -60,30 +60,29 @@ routes.get(
   redirectController.handle
 );
 
-routes.get('/v1/urls', findUrlController.handle);
-
-routes.get('/v1/urls/:hash/stats', statisticsController.handle);
+routes.get('/v1/shorts', findUrlController.handle);
+routes.get('/v1/shorts/:hash/stats', statisticsController.handle);
 
 routes.get(
-  '/v1/urls/:id',
+  '/v1/shorts/:id',
   celebrate({ [Segments.PARAMS]: Joi.object().keys({ id: Uuid() }) }),
   findUrlByIdController.handle
 );
 
 routes.post(
-  '/v1/urls',
+  '/v1/shorts',
   celebrate({ [Segments.BODY]: Joi.object().keys({ href: Url() }) }),
   createUrlController.handle
 );
 
 routes.put(
-  '/v1/urls/:id',
+  '/v1/shorts/:id',
   celebrate({ [Segments.PARAMS]: Joi.object().keys({ id: Uuid() }) }),
   updateUrlController.handle
 );
 
 routes.delete(
-  '/v1/urls/:id',
+  '/v1/shorts/:id',
   celebrate({ [Segments.PARAMS]: Joi.object().keys({ id: Uuid() }) }),
   deleteUrlController.handle
 );

@@ -46,7 +46,7 @@ Accept: application/json
 
 
 ### /v1/urls
-POST http://localhost:3333/v1/urls HTTP/1.1
+POST http://localhost:3333/v1/shorts HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 
