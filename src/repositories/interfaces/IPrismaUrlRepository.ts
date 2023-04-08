@@ -18,7 +18,7 @@ export interface IPrismaUrlRepository {
   findMany(props: {
     current: number;
     take: number;
-  }): Promise<{ shorts: Url[]; meta: Record<string, any> }>;
+  }): Promise<{ data: Url[]; meta: Record<string, any> }>;
   update(id: string, props: Pick<Url, 'href'>): Promise<Url>;
   hasByHash(hash: string): Promise<hasByHashProps | null>;
 }

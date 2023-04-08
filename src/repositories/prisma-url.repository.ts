@@ -28,7 +28,7 @@ export class PrismaUrlRepository implements IPrismaUrlRepository {
   }: {
     current: number;
     take: number;
-  }): Promise<{ shorts: Url[]; meta: Record<string, any> }> {
+  }): Promise<{ data: Url[]; meta: Record<string, any> }> {
     let currentPage = current;
 
     const total = await prismaClient.url.count();
@@ -54,7 +54,7 @@ export class PrismaUrlRepository implements IPrismaUrlRepository {
     const hasPrevious = current > 1;
 
     return {
-      shorts,
+      data: shorts,
       meta: {
         total,
         take,
@@ -62,8 +62,8 @@ export class PrismaUrlRepository implements IPrismaUrlRepository {
         current: currentPage,
         next: hasNext ? currentPage + 1 : null,
         previous: hasPrevious ? currentPage - 1 : null,
-        hasNext,
-        hasPrevious,
+        // hasNext,
+        // hasPrevious,
         length: shorts.length,
       },
     };

@@ -1,12 +1,6 @@
 import { Router } from 'express';
-import limiter from 'express-rate-limit';
-import { TooManyRequests } from 'http-errors';
-
-import Joi from 'joi';
-import { celebrate, Segments } from 'celebrate';
-
-import { nanoId, Url, Uuid } from './schemas/types.schema';
-import { reply } from './utils/reply.util';
+import { StatusCodes } from 'http-status-codes';
+import { celebrate } from 'celebrate';
 
 import { FindShortsController } from './controllers/find-shorts.controller';
 import { FindShortByIdController } from './controllers/find-short-by-id.controller';
@@ -18,118 +12,95 @@ import { CreateShortController } from './controllers/create-short.controller';
 import { DeleteShortController } from './controllers/delete-short.controller';
 import { UpdateShortController } from './controllers/update-short.controller';
 
+import Joi from './schemas/joi-validators.schema';
+import { reply } from './utils/reply.util';
+
 const routes = Router();
 
-const resolveShortController = new ResolveShortController();
-const redirectShortController = new RedirectShortController();
+const resolveController = new ResolveShortController();
+const redirectController = new RedirectShortController();
+const statisticsController = new StatisticsShortController();
 
-const findShortsController = new FindShortsController();
-const findShortByIdController = new FindShortByIdController();
-const createShortController = new CreateShortController();
-const updateShortController = new UpdateShortController();
-const deleteShortController = new DeleteShortController();
-
-const statisticsShortController = new StatisticsShortController();
-
-const createShortLimiter = limiter({
-  windowMs: 30 * 60 * 1000, // 30 minutes
-  max: 30,
-  legacyHeaders: false,
-  standardHeaders: true,
-  handler: (request, response, next) => {
-    return next(new TooManyRequests());
-  },
-});
-
-const baseLimiter = limiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 30,
-  legacyHeaders: false,
-  standardHeaders: true,
-  handler: (request, response, next) => {
-    return next(new TooManyRequests());
-  },
-});
+const findController = new FindShortsController();
+const findByIdController = new FindShortByIdController();
+const createController = new CreateShortController();
+const updateController = new UpdateShortController();
+const deleteController = new DeleteShortController();
 
 routes.get('/', async (request, response, next) => {
   try {
-    return response.json(reply());
+    return response.status(StatusCodes.OK).json(reply());
   } catch (error: any) {
     return next(error);
   }
 });
 
-//routes.param('id', (request, response, next, param) => {});
+routes.get(
+  '/r/:hash',
+  celebrate({
+    params: Joi.NanoIdParam(),
+  }),
+  redirectController.handle
+);
 
 routes.get(
   '/d/:hash',
   celebrate({
-    [Segments.PARAMS]: Joi.object().keys({ hash: nanoId() }),
-    [Segments.QUERY]: Joi.object().keys({
-      format: Joi.string()
-        .trim()
-        .lowercase()
-        .valid(...['raw', 'json'])
-        .optional()
-        .default('json'),
-    }),
+    params: Joi.NanoIdParam(),
+    query: Joi.FormatQueryParams(),
   }),
-  resolveShortController.handle
+  resolveController.handle
 );
 
-routes.get(
-  '/r/:hash',
-  celebrate({
-    [Segments.PARAMS]: Joi.object().keys({ hash: nanoId() }),
-  }),
-  redirectShortController.handle
-);
-
+/**
+ * Path: "/v1/shorts"
+ */
 routes.get(
   '/v1/shorts',
   celebrate({
-    [Segments.QUERY]: {
-      page: Joi.number().min(1).optional().default(1),
-      limit: Joi.number().min(1).max(25).optional().default(25),
-    },
+    query: Joi.PagePageSizeQueryParams(),
   }),
-  findShortsController.handle
+  findController.handle
 );
 
 routes.get(
   '/v1/shorts/:hash/stats',
-  baseLimiter,
   celebrate({
-    [Segments.PARAMS]: Joi.object().keys({ hash: nanoId() }),
+    params: Joi.NanoIdParam(),
   }),
-  statisticsShortController.handle
+  statisticsController.handle
 );
 
 routes.get(
   '/v1/shorts/:id',
-  celebrate({ [Segments.PARAMS]: Joi.object().keys({ id: Uuid() }) }),
-  findShortByIdController.handle
+  celebrate({
+    params: Joi.UuidParam(),
+  }),
+  findByIdController.handle
 );
 
 routes.post(
   '/v1/shorts',
-  createShortLimiter,
-  celebrate({ [Segments.BODY]: Joi.object().keys({ href: Url() }) }),
-  createShortController.handle
+  celebrate({
+    body: Joi.UrlParam(),
+  }),
+  createController.handle
 );
 
 routes.put(
   '/v1/shorts/:id',
-  baseLimiter,
-  celebrate({ [Segments.PARAMS]: Joi.object().keys({ id: Uuid() }) }),
-  updateShortController.handle
+  celebrate({
+    params: Joi.UuidParam(),
+  }),
+  updateController.handle
 );
 
 routes.delete(
   '/v1/shorts/:id',
-  baseLimiter,
-  celebrate({ [Segments.PARAMS]: Joi.object().keys({ id: Uuid() }) }),
-  deleteShortController.handle
+  celebrate({
+    params: Joi.UuidParam(),
+  }),
+  deleteController.handle
 );
 
 export { routes };

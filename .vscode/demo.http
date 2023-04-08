@@ -13,7 +13,7 @@ Content-Type: application/json
 Accept: application/json
 
 ### /d/{{hash}}
-GET http://localhost:3333/d/e4PkRt9/?format=raw HTTP/1.1
+GET http://localhost:3333/d/e4PkRt9/?format=json HTTP/1.1
 Content-Type: application/json
 Accept: application/jsona
 
@@ -52,11 +52,10 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "href": "https://google.com/?q=Nest.js"
+  "href": "https://google.com/?q=Express.js"
 }
 
-
 ### /v1/shorts/{{id}}
-DELETE http://localhost:3333/v1/shorts/dfff4873-f067-4f17-b3d9-83fd9c0cda12 HTTP/1.1
+DELETE http://localhost:3333/v1/shorts/efcdab28-33f7-4dd6-a620-a781e9e3fe49 HTTP/1.1
 Content-Type: application/json
 Accept: application/json

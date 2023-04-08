@@ -21,13 +21,10 @@ export const Server: HttpServer = createServer(app);
 export async function bootstrap(): Promise<HttpServer> {
   await prismaClient.$connect();
 
-  const server = Server.listen(PORT, () =>
-    console.log(`\nServer running on port: ${PORT}`)
-  );
+  const server = Server.listen(PORT, () => console.log(`\nPORT: ${PORT}`));
 
   SIGNAL_TERMS.forEach((term) => {
     process.on(term, () => {
-      console.log(`Term: ${term}\n`);
       server.close(async () => {
         await prismaClient.$disconnect();
 
