@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider          = "sqlite"
+  provider          = "postgresql"
   url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOWN_DATABASE_URL")
 }
@@ -30,4 +30,6 @@ model Statistic {
   userAgent String   @map(name: "user_agent")
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@map(name: "statistics")
 }
