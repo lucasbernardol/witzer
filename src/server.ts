@@ -5,9 +5,12 @@ import type { Server as HttpServer } from 'node:http';
 import { prismaClient } from './prisma';
 import { app } from './app';
 
-const TERMS: string[] = [
+type SignalTerms = NodeJS.Signals | 'uncaughtException' | 'unhandledRejection';
+
+const SIGNAL_TERMS: Array<SignalTerms> = [
   'SIGINT',
   'SIGKILL',
+  'SIGTERM',
   'SIGBREAK',
   'uncaughtException',
   'unhandledRejection',
@@ -24,7 +27,7 @@ export async function bootstrap(): Promise<HttpServer> {
     console.log(`\nServer running on port: ${PORT}`)
   );
 
-  TERMS.forEach((term) => {
+  SIGNAL_TERMS.forEach((term) => {
     process.on(term, () => {
       console.log(`Term: ${term}\n`);
       server.close(async () => {
