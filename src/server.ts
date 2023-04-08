@@ -9,9 +9,7 @@ type SignalTerms = NodeJS.Signals | 'uncaughtException' | 'unhandledRejection';
 
 const SIGNAL_TERMS: Array<SignalTerms> = [
   'SIGINT',
-  'SIGKILL',
   'SIGTERM',
-  'SIGBREAK',
   'uncaughtException',
   'unhandledRejection',
 ];
