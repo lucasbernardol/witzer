@@ -5,14 +5,13 @@ import helmet from 'helmet';
 import cors from 'cors';
 
 import limiter from 'express-rate-limit';
-import RedisStore from 'rate-limit-redis';
+// import RedisStore from 'rate-limit-redis';
 
 import hpp from 'hpp';
 
 import { HttpError, isHttpError, NotFound, TooManyRequests } from 'http-errors';
 import { errors } from 'celebrate';
 
-import { redisClient } from './redis';
 import { routes } from './routes';
 
 export const app = express();
@@ -25,14 +24,6 @@ const globalLimiter = limiter({
   handler: (request, response, next) => {
     return next(new TooManyRequests());
   },
-  ...(process.env.NODE_ENV === 'production'
-    ? {
-        store: new RedisStore({
-          // @ts-expect-error - Known issue: the `call` function is not present in @types/ioredis
-          sendCommand: (...args: string[]) => redisClient.call(...args),
-        }),
-      }
-    : {}),
 });
 
 app.use(express.json());

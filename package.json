@@ -49,12 +49,10 @@
     "hpp": "^0.2.3",
     "http-errors": "^2.0.0",
     "http-status-codes": "^2.2.0",
-    "ioredis": "^5.3.1",
     "joi": "^17.9.1",
     "morgan": "^1.10.0",
     "nanoid": "3.3.4",
     "nanoid-dictionary": "^4.3.0",
-    "rate-limit-redis": "^3.0.1",
     "validator": "^13.9.0"
   }
 }
