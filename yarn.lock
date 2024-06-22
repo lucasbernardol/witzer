@@ -50,6 +50,11 @@
   dependencies:
     undici-types "~5.26.4"
 
+hono@^4.4.7:
+  version "4.4.7"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-4.4.7.tgz#c7b195bdeff0b46e829189c08049decc0c6510c0"
+  integrity sha512-WoQWFQyVFEVRtIzP5sHPv7nvIw+RYL/HRnvnOCDxj6A+BtrwuC9S0vryZbV4IyFcNgOJ87r/phDiC1x2eEo4Gg==
+
 prettier@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.3.2.tgz#03ff86dc7c835f2d2559ee76876a3914cec4a90a"
