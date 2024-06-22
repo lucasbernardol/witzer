@@ -1,62 +1,54 @@
 import { zValidator } from '@hono/zod-validator';
 import { HTTPException } from 'hono/http-exception';
-import { Hono } from 'hono';
-
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
-import { prismaClient } from '@modules/drivers/prismaClient';
+import { AppRouterFactory } from '@factories/app-router.factory';
 
-export const shorterRedirectRoute = new Hono();
+import { zodValidationHook } from '@utils/zod-validation-hook.util';
+import { nanoid } from '@schemas/nanoid.schema';
+
+export const shorterRedirectRoute = AppRouterFactory.createApp();
 
 shorterRedirectRoute.get(
 	'/:hash',
 	zValidator(
 		'param',
-		z.object({ hash: z.string().trim().min(8).max(8) }).required(),
+		z.object({ hash: nanoid() }).required(),
+		zodValidationHook,
 	),
-	async (context) => {
-		const { hash } = context.req.valid('param');
+	async (ctx, next) => {
+		// Chekc if cache exists
+		const { hash } = ctx.req.valid('param');
 
-		console.log(hash);
+		const shortener = await ctx.var.redis.get(hash);
 
-		const shortener = await prismaClient.shortener.findUnique({
+		if (shortener) {
+			// Add queue
+			return ctx.redirect(shortener, StatusCodes.MOVED_TEMPORARILY);
+		}
+
+		await next();
+	},
+	async (ctx) => {
+		const { hash } = ctx.req.valid('param');
+
+		const shortener = await ctx.var.prismaClient.shortener.findUnique({
 			where: {
 				hash,
-			},
-			select: {
-				id: true,
-				href: true,
 			},
 		});
 
 		if (!shortener) {
 			throw new HTTPException(StatusCodes.BAD_REQUEST, {
-				message: 'Invalid shortener hash',
+				message: 'Invalid hash!',
 			});
 		}
 
-		// Analitics
-		await prismaClient.$transaction(async (prismaContext) => {
-			await prismaContext.analytic.create({
-				data: {
-					shortenerId: shortener.id,
-					userAgent: context.req.header('User-Agent') ?? 'unknown',
-				},
-			});
+		await ctx.var.redis.set(hash, shortener.href, 'EX', 30 * 60);
 
-			await prismaContext.shortener.update({
-				where: {
-					id: shortener.id,
-				},
-				data: {
-					redirectings: {
-						increment: 1,
-					},
-				},
-			});
-		});
+		// Add analytocs to queue
 
-		return context.redirect(shortener.href);
+		return ctx.redirect(shortener.href, StatusCodes.MOVED_TEMPORARILY);
 	},
 );

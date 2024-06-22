@@ -5,5 +5,7 @@ declare namespace NodeJS {
 
 		CURRENT_HOST: string;
 		BLACKLIST_HOSTS: string;
+
+		REDIS_URL: string;
 	}
 }
