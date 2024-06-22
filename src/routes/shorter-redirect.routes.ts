@@ -5,7 +5,7 @@ import { Hono } from 'hono';
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
-import { prismaClient } from '../prismaClient';
+import { prismaClient } from '@modules/drivers/prismaClient';
 
 export const shorterRedirectRoute = new Hono();
 
@@ -14,7 +14,6 @@ shorterRedirectRoute.get(
 	zValidator(
 		'param',
 		z.object({ hash: z.string().trim().min(8).max(8) }).required(),
-		
 	),
 	async (context) => {
 		const { hash } = context.req.valid('param');

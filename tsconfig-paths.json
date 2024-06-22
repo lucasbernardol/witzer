@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@factories/*": ["./src/factory/*"],
+			"@routes/*": ["./src/routes/*"],
+			"@utils/*": ["./src/utils/*"],
+			"@schemas/*": ["./src/schemas/*"],
+			"@modules/*": ["./src/modules/*"]
+		}
+	}
+}

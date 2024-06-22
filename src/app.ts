@@ -9,7 +9,7 @@ import { StatusCodes } from 'http-status-codes';
 import { shorts } from './routes/shorter.routes';
 
 import { shorterRedirectRoute } from './routes/shorter-redirect.routes';
-import { AnalyticRoute } from './routes/analytics.routes';
+import { AnalyticsRoute } from './routes/analytics.routes';
 
 const app = new Hono();
 
@@ -22,7 +22,7 @@ app.use(logger());
 app.route('/r', shorterRedirectRoute);
 
 app.route('/api', shorts);
-app.route('/api', AnalyticRoute);
+app.route('/api', AnalyticsRoute);
 
 app.onError(async (error, context) => {
 	if (error instanceof HTTPException) {

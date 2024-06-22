@@ -1,28 +1,19 @@
-//import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
-
 import { StatusCodes } from 'http-status-codes';
-import { prismaClient } from '../prismaClient';
+import { AppRouterFactory } from '@factories/app-router.factory';
 
-export const AnalyticRoute = new Hono();
+export const AnalyticsRoute = AppRouterFactory.createApp();
 
-AnalyticRoute.get('/analytics', async (context) => {
-	// total shorteners/redirections
-	const [shorteners, redirectings] = await prismaClient.$transaction(
-		async (prismaContext) => {
-			const shorteners = await prismaContext.shortener.count();
+AnalyticsRoute.get('/analytics', async (ctx) => {
+	// Analytics
+	const [shorteners, redirectings] = await ctx.var.prismaClient.$transaction(
+		async (context) => {
+			const shorts = await context.shortener.count();
 
-			const redirectings = await prismaContext.analytic.count();
+			const analytics = await context.analytic.count();
 
-			return [shorteners, redirectings];
+			return [shorts, analytics];
 		},
 	);
 
-	return context.json(
-		{
-			shorteners,
-			redirectings,
-		},
-		StatusCodes.OK,
-	);
+	return ctx.json({ shorteners, redirectings }, StatusCodes.OK);
 });

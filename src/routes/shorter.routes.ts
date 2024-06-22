@@ -7,19 +7,12 @@ import isURL from 'validator/lib/isURL';
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
-import { prismaClient } from '../prismaClient';
-import { nanoid } from '../utils/nanoid.util';
+import { prismaClient } from '@modules/drivers/prismaClient';
+
+import { nanoid } from '@utils/nanoid.util';
+import { zodValidationHook } from '@utils/zod-validation-hook.util';
 
 export const shorts = new Hono();
-
-const zodValidationHook: Hook<{}, any, any, {}> = (result, context) => {
-	if (!result.success) {
-		throw new HTTPException(StatusCodes.BAD_REQUEST, {
-			message: result.error.errors[0].message,
-			cause: result,
-		});
-	}
-};
 
 shorts.post(
 	'/shorts',
@@ -52,10 +45,12 @@ shorts.post(
 	async (context) => {
 		const { href } = context.req.valid('json');
 
+		const hash = await nanoid();
+
 		const shorter = await prismaClient.shortener.create({
 			data: {
 				href,
-				hash: nanoid(),
+				hash,
 			},
 		});
 
