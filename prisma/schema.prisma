@@ -14,9 +14,11 @@ datasource db {
 }
 
 model Shortener {
-  id   String @id @map("_id") @db.ObjectId
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
   href String
   hash String @unique
+
+  redirectings Int @default(0)
 
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now()) @updatedAt
@@ -26,7 +28,7 @@ model Shortener {
 }
 
 model Analytic {
-  id          String    @id @map("_id") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   userAgent   String
   shortenerId String    @db.ObjectId
   shortener   Shortener @relation(fields: [shortenerId], references: [id])
