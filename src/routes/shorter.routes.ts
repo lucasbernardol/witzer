@@ -1,59 +1,59 @@
-import { zValidator, Hook } from '@hono/zod-validator';
-import { HTTPException } from 'hono/http-exception';
-import { Hono } from 'hono';
-
-import isURL from 'validator/lib/isURL';
+import { zValidator } from '@hono/zod-validator';
+import { env } from 'hono/adapter';
 
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
-import { prismaClient } from '@modules/drivers/prismaClient';
-
-import { nanoid } from '@utils/nanoid.util';
+import { AppRouterFactory } from '@factories/app-router.factory';
 import { zodValidationHook } from '@utils/zod-validation-hook.util';
 
-export const shorts = new Hono();
+import { nanoid } from '@utils/nanoid.util';
+import { url } from '@schemas/url.schema';
 
-shorts.post(
+export const ShorternersRoute = AppRouterFactory.createApp();
+
+ShorternersRoute.post(
 	'/shorts',
 	zValidator(
 		'json',
 		z
 			.object({
-				href: z
-					.string()
-					.url()
-					.max(2048)
-					.trim()
-					.refine(
-						(value) => {
-							return isURL(value, {
-								host_blacklist: [
-									'localhost',
-									'127.0.01',
-									process.env.CURRENT_HOST,
-									...process.env.BLACKLIST_HOSTS.split(','),
-								],
-							});
-						},
-						{ message: 'Invalid domain/host' },
-					),
+				href: url(),
 			})
 			.required(),
 		zodValidationHook,
 	),
-	async (context) => {
-		const { href } = context.req.valid('json');
+	async (ctx) => {
+		const { href } = ctx.req.valid('json');
+
+		const { HOST = 'http://localhost:3333' } = env<{ HOST: string }>(ctx);
 
 		const hash = await nanoid();
 
-		const shorter = await prismaClient.shortener.create({
+		const shorter = await ctx.var.prismaClient.shorterner.create({
 			data: {
 				href,
 				hash,
 			},
 		});
 
-		return context.json(shorter, StatusCodes.CREATED);
+		// Remove analytics caching
+		await ctx.var.redis.del('analytics');
+
+		// Add current shortener to cache
+		await ctx.var.redis.set(
+			hash,
+			JSON.stringify({ href: shorter.href, shorternerId: shorter.id }),
+			'EX',
+			5 * 60, // 5 minutes
+		);
+
+		return ctx.json(
+			{
+				code: shorter.hash,
+				href: `${HOST}/r/${shorter.hash}`,
+			},
+			StatusCodes.CREATED,
+		);
 	},
 );

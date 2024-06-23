@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import '@modules/workers';
 
 import { serve } from '@hono/node-server';
 // import { env } from 'hono/adapter'

@@ -7,14 +7,17 @@ export const url = () => {
 		.url()
 		.max(2048)
 		.trim()
-		.refine((value) => {
-			return isURL(value, {
-				host_blacklist: [
-					'localhost',
-					'127.0.01',
-					process.env.CURRENT_HOST,
-					...process.env.BLACKLIST_HOSTS.split(','),
-				],
-			});
-		});
+		.refine(
+			(value) => {
+				return isURL(value, {
+					host_blacklist: [
+						'localhost',
+						'127.0.01',
+						process.env.CURRENT_HOST,
+						...process.env.BLACKLIST_HOSTS.split(','),
+					],
+				});
+			},
+			{ message: 'Invalid host/domain' },
+		);
 };

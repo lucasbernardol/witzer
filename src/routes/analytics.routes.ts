@@ -3,8 +3,6 @@ import { AppRouterFactory } from '@factories/app-router.factory';
 
 export const AnalyticsRoute = AppRouterFactory.createApp();
 
-const ANALYTICS_EXPIRES = 30 * 60; // 30 minutes (seconds)
-
 AnalyticsRoute.get(
 	'/analytics',
 	async (ctx, next) => {
@@ -21,11 +19,11 @@ AnalyticsRoute.get(
 	async (ctx) => {
 		const analytics = await ctx.var.prismaClient.$transaction(
 			async (context) => {
-				const shorteners = await context.shortener.count();
+				const shorterners = await context.shorterner.count();
 
 				const redirectings = await context.analytic.count();
 
-				return { shorteners, redirectings };
+				return { shorterners, redirectings };
 			},
 		);
 
@@ -33,7 +31,7 @@ AnalyticsRoute.get(
 			'analytics',
 			JSON.stringify(analytics),
 			'EX',
-			ANALYTICS_EXPIRES,
+			5 * 60, // 5 minutes
 		);
 
 		return ctx.json(analytics, StatusCodes.OK);

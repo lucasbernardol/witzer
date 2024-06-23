@@ -2,18 +2,16 @@
 #### /
 GET http://localhost:3333 HTTP/1.1
 
-
-
 ### (SHORTS) CREATE
 POST http://localhost:3333/api/shorts HTTP/1.1
 Content-Type: application/json
 
 {
-	"href": "https://localhost"
+	"href": "https://www.google.com"
 }
 
 ### (SHORTS) REDIRECTING
-GET http://localhost:3333/r/9T7bacs8 HTTP/1.1
+GET http://localhost:3333/r/SwUMtJsN HTTP/1.1
 Accept: */*
 
 
